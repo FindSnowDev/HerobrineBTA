@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "btabrine",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This mod aims to help new BTA modders.",
+  "name": "BTA Herobrine",
+  "description": "Herobrine in BTA.",
   "authors": [
-    "Turnip Labs"
+    "FindSnow"
   ],
   "contact": {
     "homepage": "",
@@ -14,25 +14,25 @@
   },
 
 	"icon": "icon.png",
-  "license": "CC0-1.0",
+  "license": "MIT",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-			"turniplabs.examplemod.ExampleMod"
+      "net.findsnow.btabrine.BTABrine"
     ],
 		"beforeGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+          "net.findsnow.btabrine.BTABrine"
 		],
 		"afterGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+          "net.findsnow.btabrine.BTABrine"
 		],
 		"recipesReady": [
-			"turniplabs.examplemod.ExampleMod"
+          "net.findsnow.btabrine.BTABrine"
 		]
 	},
   "mixins": [
-      "examplemod.mixins.json"
+    "btabrine.mixins.json"
   ],
 
   "depends": {
