@@ -1,9 +1,6 @@
 package net.findsnow.btabrine.common.event;
 
 import net.minecraft.core.block.Blocks;
-import net.minecraft.core.entity.EntityDispatcher;
-import net.minecraft.core.entity.EntityLightning;
-import net.minecraft.core.entity.Mob;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.weather.Weathers;
 
@@ -33,31 +30,10 @@ public class ShrineEvent {
 
 	private void activateShrine(World world, int x, int y, int z) {
 		if (world != null) {
-
-
-			if (!hasWarned) {
-				hasWarned = true;
-				world.sendGlobalMessage("Stop.");
-			}
-
 			if (world.rand.nextInt(100) < 20) {
-				Mob herobrine = (Mob)EntityDispatcher.createEntityInWorld(this.herobrineID, world);
-				if (herobrine != null) {
 
-					EntityLightning lightning = new EntityLightning(world, x, y, z);
-					world.entityJoinedWorld(lightning);
-
-					herobrine.moveTo(x + 0.5, y + 1.0, z + 0.5, world.rand.nextFloat() * 360.0F, 0.0F);
-					world.entityJoinedWorld(herobrine);
-
-					if (world.weatherManager != null) {
-						world.weatherManager.overrideWeather(Weathers.OVERWORLD_FOG, 200, 100);
-					}
-
-					world.playSoundAtEntity(null, herobrine, "btabrine:mob.herobrine.vanish", 1.0F, 1.0F);
-
-					String randomPhrase = spawnPhrases[world.rand.nextInt(spawnPhrases.length)];
-					world.sendGlobalMessage(randomPhrase);
+				if (world.weatherManager != null) {
+					world.weatherManager.overrideWeather(Weathers.OVERWORLD_FOG, 50, 0.250F);
 				}
 			}
 		}

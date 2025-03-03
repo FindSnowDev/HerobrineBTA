@@ -2,16 +2,18 @@ package net.findsnow.btabrine.common.entity;
 
 import com.mojang.nbt.tags.CompoundTag;
 import net.minecraft.core.entity.Entity;
-import net.minecraft.core.entity.monster.MobMonster;
+import net.minecraft.core.entity.MobPathfinder;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.phys.Vec3;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.weather.Weathers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class HerobrineEntity extends MobMonster {
+public class HerobrineEntity extends MobPathfinder {
+
 	private Player player;
 	private int stalkingCooldown;
 	private int stalkingTimeRemaining = 0;
@@ -29,7 +31,6 @@ public class HerobrineEntity extends MobMonster {
 		this.roamRandomPath();
 		this.fireImmune = true;
 	}
-
 
 	// Data
 	@Override
@@ -102,7 +103,7 @@ public class HerobrineEntity extends MobMonster {
 			return;
 		}
 
-		if (!isBeingWatched() && this.random.nextInt(100) == 10) {
+		if (!isBeingWatched() && this.random.nextInt(100) == 60) {
 			Vec3 playerLookDirection = player.getViewVector(1.0F).normalize();
 			double stalkingDist = MIN_DIST + this.random.nextDouble() * 5.0;
 
@@ -171,7 +172,10 @@ public class HerobrineEntity extends MobMonster {
 		System.out.println("Herobrine disappeared!");
 		this.stalkingCooldown = 3600;
 		this.setBeingWatched(false);
-		world.playSoundAtEntity(null, this, "btabrine:mob.herobrine.vanish", 1.0F, 1.0F);
+		if (world.weatherManager != null) {
+			world.weatherManager.overrideWeather(Weathers.OVERWORLD_FOG, 200, 100);
+		}
+		world.playSoundAtEntity(null, player, "btabrine:mob.herobrine.vanish", 1.0F, 1.0F);
 		this.remove();
 	}
 

@@ -1,15 +1,19 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "net.findsnow.btabrine.common.mixin",
-    "compatibilityLevel": "JAVA_8",
-    "mixins": [
-      "MixinChunkDecoratorOverworld",
-      "MixinBlockFire"
-    ],
-    "client": [
-    ],
-    "injectors": {
-        "defaultRequire": 1
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.findsnow.btabrine.common.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinBlockFire",
+    "MixinChunkDecoratorOverworld",
+    "MixinWorld",
+    "MixinSleepEvent"
+  ],
+  "client": [
+    "MixinWorldMP",
+    "MixinSleepEventMP"
+  ],
+  "injectors": {
+    "defaultRequire": 1
   }
 }

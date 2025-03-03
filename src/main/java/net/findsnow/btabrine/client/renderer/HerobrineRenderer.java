@@ -38,11 +38,11 @@ public class HerobrineRenderer extends MobRenderer<HerobrineEntity> {
 			if (LightmapHelper.isLightmapEnabled()) {
 				LightmapHelper.setLightmapCoord(LightmapHelper.getLightmapCoord(15, 15));
 			}
-			float f1 = (1.0F - brightness) * 0.5F;
+			float f1 = (1.0F - brightness) * 0.2F;
 			GL11.glEnable(3042);
 			GL11.glDisable(3008);
 			GL11.glBlendFunc(770, 771);
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, f1);
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, f1  + 1.0F);
 			return true;
 		} else
 			return false;

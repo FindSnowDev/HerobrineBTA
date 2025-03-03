@@ -2,19 +2,47 @@
   "mob.herobrine.vanish": {
     "subtitle": "subtitles.ambient.cave",
     "sounds": [
-      "cave1.ogg",
-      "cave10.ogg",
-      "cave11.ogg",
-      "cave12.ogg",
-      "cave13.ogg",
-      "cave2.ogg",
-      "cave3.ogg",
-      "cave4.ogg",
-      "cave5.ogg",
-      "cave6.ogg",
-      "cave7.ogg",
-      "cave8.ogg",
-      "cave9.ogg"
+      "vanish/cave1.ogg",
+      "vanish/cave10.ogg",
+      "vanish/cave11.ogg",
+      "vanish/cave12.ogg",
+      "vanish/cave13.ogg",
+      "vanish/cave2.ogg",
+      "vanish/cave3.ogg",
+      "vanish/cave4.ogg",
+      "vanish/cave5.ogg",
+      "vanish/cave6.ogg",
+      "vanish/cave7.ogg",
+      "vanish/cave8.ogg",
+      "vanish/cave9.ogg"
+    ]
+  },
+  "ambient.herobrine.mine1": {
+    "subtitle": "subtitles.ambient.herobrine.mining",
+    "sounds": [
+      "ambient/mine1.ogg",
+      "ambient/mine2.ogg",
+      "ambient/mine3.ogg"
+    ]
+  },
+  "ambient.herobrine.step1": {
+    "subtitle": "subtitles.ambient.herobrine.footsteps",
+    "sounds": [
+      "ambient/step1.ogg",
+      "ambient/step2.ogg",
+      "ambient/step3.ogg"
+    ]
+  },
+  "ambient.herobrine.door_open": {
+    "subtitle": "subtitles.ambient.herobrine.door",
+    "sounds": [
+      "ambient/door_open.ogg"
+    ]
+  },
+  "ambient.herobrine.door_shut": {
+    "subtitle": "subtitles.ambient.herobrine.door",
+    "sounds": [
+      "ambient/door_shut.ogg"
     ]
   }
 }

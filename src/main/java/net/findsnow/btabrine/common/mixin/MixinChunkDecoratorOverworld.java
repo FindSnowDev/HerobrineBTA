@@ -1,7 +1,10 @@
 package net.findsnow.btabrine.common.mixin;
 
 
+import net.findsnow.btabrine.common.world.features.BTABMissingLeavesFeature;
 import net.findsnow.btabrine.common.world.features.BTABPyramidFeature;
+import net.findsnow.btabrine.common.world.features.BTABSignFeature;
+import net.findsnow.btabrine.common.world.features.BTABTunnelFeature;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
@@ -21,9 +24,11 @@ public class MixinChunkDecoratorOverworld {
 	@Final
 	private World world;
 
+	private static final BTABSignFeature signFeature = new BTABSignFeature();
+
 	@Inject(
 		method = "decorate",
-		at = @At("HEAD")
+		at = @At("TAIL")
 	)
 	private void addPyramidGeneration(Chunk chunk, CallbackInfo ci) {
 		int chunkX = chunk.xPosition;
@@ -35,10 +40,64 @@ public class MixinChunkDecoratorOverworld {
 		int x = chunkX * 16 + rand.nextInt(16) + 8;
 		int z = chunkZ * 16 + rand.nextInt(16) + 8;
 		int y = this.world.getHeightValue(x, z);
-		if (rand.nextInt(25) == 0 && y > 50 && isFlatLand(x, y - 1, z)) {
+
+		if (rand.nextInt(100) == 0 && y > 50 && isFlatLand(x, y - 1, z)) {
 			new BTABPyramidFeature().place(this.world, rand, x, y, z);
 		}
+
+		if (rand.nextInt(15) == 0) {
+			for (int attempts = 0; attempts < 3; attempts++) {
+				int tunnelX = chunkX * 16 + rand.nextInt(16);
+				int tunnelZ = chunkZ * 16 + rand.nextInt(16);
+				int surfaceY = this.world.getHeightValue(tunnelX, tunnelZ);
+				int tunnelY;
+
+				if (surfaceY > 80) {
+					tunnelY = 10 + rand.nextInt(surfaceY - 25);
+				} else {
+					tunnelY = 20 + rand.nextInt(50);
+				}
+
+				if (this.world.getBlockId(tunnelX, tunnelY, tunnelZ) != 0 ) {
+					if (new BTABTunnelFeature().place(this.world, rand, tunnelX, tunnelY, tunnelZ)) {
+						break;
+					}
+				}
+			}
+		}
+
+		if (rand.nextInt(10) == 0) {
+			new BTABMissingLeavesFeature().place(this.world, rand, chunkX, 0, chunkZ);
+		}
+
+		if (rand.nextInt(10) == 0) {
+			for (int attempts =0; attempts < 10; attempts++) {
+				int signX = chunkX * 16 + rand.nextInt(16);
+				int signZ = chunkZ * 16 + rand.nextInt(16);
+				int signY = this.world.getHeightValue(signX, signZ);
+
+				if (signY > 60 && !isNearWater(signX, signY, signZ)) {
+					if (signFeature.place(this.world, rand, signX, signY, signZ)) {
+						break;
+					}
+				}
+			}
+		}
+
 	}
+
+	private boolean isNearWater(int x, int y, int z) {
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dz = -2; dz <= 2; dz++) {
+				int blockID = this.world.getBlockId(x + dx, y, z + dz);
+				if (blockID == Blocks.FLUID_WATER_FLOWING.id() || blockID == Blocks.FLUID_WATER_STILL.id()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean isFlatLand(int x, int y, int z) {
 		for (int dx = -2; dx <= 2; dx++) {
 			for (int dz = -2; dz <= 2; dz++) {

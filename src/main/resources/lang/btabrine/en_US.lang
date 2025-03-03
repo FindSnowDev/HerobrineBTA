@@ -1,3 +1,9 @@
 entity.btabrine.herobrine=Herobrine
+entity.btabrine.herobrine_nightmare=Herobrine
 btabrine.name=Herobrine
 btabrine.desc=Herobrine
+
+mob.herobrine.vanish=Herobrine Vanish
+subtitles.ambient.herobrine.mining=Nearby blocks breaking
+subtitles.ambient.herobrine.footsteps=Footsteps
+subtitles.ambient.herobrine.door=Who was that?

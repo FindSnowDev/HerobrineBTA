@@ -6,6 +6,7 @@ import net.findsnow.btabrine.BTABrine;
 import net.findsnow.btabrine.client.model.HerobrineModel;
 import net.findsnow.btabrine.client.renderer.HerobrineRenderer;
 import net.findsnow.btabrine.common.entity.HerobrineEntity;
+import net.findsnow.btabrine.common.entity.HerobrineNightmareEntity;
 import net.minecraft.core.util.collection.NamespaceID;
 import turniplabs.halplibe.helper.EntityHelper;
 import turniplabs.halplibe.helper.ModelHelper;
@@ -21,10 +22,18 @@ public class BTABEntities {
 		    "Herobrine",
 		    entityID++
 	    );
+	    EntityHelper.createEntity(
+		    HerobrineNightmareEntity.class,
+		    NamespaceID.getPermanent(BTABrine.MOD_ID, "herobrineNightmare"),
+		    "entity.btabrine.herobrine_nightmare",
+		    "HerobrineNightmare",
+		    entityID++
+	    );
     }
 
 	@Environment(EnvType.CLIENT)
 	public static void registerRenderers() {
 		ModelHelper.setEntityModel(HerobrineEntity.class,  () -> new HerobrineRenderer(new HerobrineModel(0), new HerobrineModel(0), 1));
+		ModelHelper.setEntityModel(HerobrineNightmareEntity.class,  () -> new HerobrineRenderer(new HerobrineModel(0), new HerobrineModel(0), 1));
 	}
 }
