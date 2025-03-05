@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class SleepEvent {
 	private static final Random random = new Random();
-	private static final float NIGHTMARE_CHANCE = 0.05F;
+	private static final float NIGHTMARE_CHANCE = 0.03F;
 
 	private boolean isNightmareRunning = false;
 	private int nightmareDuration = 0;
@@ -70,7 +70,7 @@ public class SleepEvent {
 		int bedDirection = getBedDirection(bedX, bedY, bedZ);
 
 		double herobrineX = bedX;
-		double herobrineY = bedY + 0.5;
+		double herobrineY = bedY;
 		double herobrineZ = bedZ;
 
 		double distance = 2;
@@ -97,16 +97,16 @@ public class SleepEvent {
 
 		float yaw = 0;
 		switch (bedDirection) {
-			case 0: // South (+Z)
+			case 0:
 				yaw = 0;
 				break;
-			case 1: // West (-X)
+			case 1:
 				yaw = 90;
 				break;
-			case 2: // North (-Z)
+			case 2:
 				yaw = 180;
 				break;
-			case 3: // East (+X)
+			case 3:
 				yaw = 270;
 				break;
 		}

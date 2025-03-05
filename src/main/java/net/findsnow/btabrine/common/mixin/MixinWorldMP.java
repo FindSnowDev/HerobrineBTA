@@ -3,6 +3,8 @@ package net.findsnow.btabrine.common.mixin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.findsnow.btabrine.client.sounds.IHerobrineCues;
+import net.findsnow.btabrine.common.entity.HerobrineStalkingEntity;
+import net.findsnow.btabrine.common.util.HerobrineManager;
 import net.minecraft.client.net.handler.PacketHandlerClient;
 import net.minecraft.client.world.WorldClient;
 import net.minecraft.client.world.WorldClientMP;
@@ -10,6 +12,7 @@ import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.MathHelper;
+import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.ChunkCoordinate;
 import net.minecraft.core.world.type.WorldType;
 import net.minecraft.core.world.type.WorldTypes;
@@ -28,6 +31,9 @@ public class MixinWorldMP extends WorldClient implements IHerobrineCues {
 
 	@Unique
 	private int btabrine_soundCounter;
+
+	@Unique
+	private int btabrine_spawnCounter = 0;
 
 	@Unique
 	public boolean isSurface(Entity entity) {
@@ -54,6 +60,26 @@ public class MixinWorldMP extends WorldClient implements IHerobrineCues {
 			return true;
 		}
 		return false;
+	}
+
+
+
+	@Unique
+	private void btabrine_trySpawnHerobrineStalker() {
+		if (btabrine_spawnCounter > 0) {
+			btabrine_spawnCounter--;
+			return;
+		}
+		btabrine_spawnCounter = 100;
+
+		for (Player player : players) {
+			HerobrineStalkingEntity.trySpawn((World)(Object)this, player);
+		}
+	}
+
+	@Unique
+	private void btabrine_herobrineManager() {
+		HerobrineManager.getInstance().onWorldTick((World)(Object)this);
 	}
 
 	@Unique
@@ -97,7 +123,7 @@ public class MixinWorldMP extends WorldClient implements IHerobrineCues {
 				int blockZ = chunkBlockZ + (randVal / 256 & 15);
 				int blockY = getHeightValue(blockX, blockZ) - 5 - rand.nextInt(10);
 
-				if (rand.nextInt(100) < 20) {
+				if (rand.nextInt(100) < 0.5) {
 					Player closestPlayer = getClosestPlayer(blockX + 0.5, blockY + 0.5, blockZ + 0.5, 24);
 					if (closestPlayer != null) {
 						double distSq = closestPlayer.distanceToSqr(blockX + 0.5, blockY + 0.5, blockZ + 0.5);
@@ -158,5 +184,6 @@ public class MixinWorldMP extends WorldClient implements IHerobrineCues {
 	@Inject(method = "tick", at = @At("TAIL"))
 	private void btabrine_tick(CallbackInfo callbackInfo) {
 		btabrine_startSoundCue();
+		btabrine_herobrineManager();
 	}
 }

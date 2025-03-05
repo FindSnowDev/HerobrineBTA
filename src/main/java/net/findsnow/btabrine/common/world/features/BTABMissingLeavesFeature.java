@@ -24,7 +24,7 @@ public class BTABMissingLeavesFeature extends WorldFeature {
 					if (isLeafBlock(blockID)) {
 
 						random.nextInt(100);
-						world.setBlockWithNotify(startX + x, currentY, startZ + z, 0);
+						world.setBlock(startX + x, currentY, startZ + z, 0);
 						removedAny = true;
 
 						if (random.nextInt(10) == 0) {

@@ -24,8 +24,6 @@ public class MixinChunkDecoratorOverworld {
 	@Final
 	private World world;
 
-	private static final BTABSignFeature signFeature = new BTABSignFeature();
-
 	@Inject(
 		method = "decorate",
 		at = @At("TAIL")
@@ -41,7 +39,7 @@ public class MixinChunkDecoratorOverworld {
 		int z = chunkZ * 16 + rand.nextInt(16) + 8;
 		int y = this.world.getHeightValue(x, z);
 
-		if (rand.nextInt(100) == 0 && y > 50 && isFlatLand(x, y - 1, z)) {
+		if (rand.nextInt(310) == 0 && y > 50 && isFlatLand(x, y - 1, z)) {
 			new BTABPyramidFeature().place(this.world, rand, x, y, z);
 		}
 
@@ -66,36 +64,9 @@ public class MixinChunkDecoratorOverworld {
 			}
 		}
 
-		if (rand.nextInt(10) == 0) {
+		if (rand.nextInt(20) == 0) {
 			new BTABMissingLeavesFeature().place(this.world, rand, chunkX, 0, chunkZ);
 		}
-
-		if (rand.nextInt(10) == 0) {
-			for (int attempts =0; attempts < 10; attempts++) {
-				int signX = chunkX * 16 + rand.nextInt(16);
-				int signZ = chunkZ * 16 + rand.nextInt(16);
-				int signY = this.world.getHeightValue(signX, signZ);
-
-				if (signY > 60 && !isNearWater(signX, signY, signZ)) {
-					if (signFeature.place(this.world, rand, signX, signY, signZ)) {
-						break;
-					}
-				}
-			}
-		}
-
-	}
-
-	private boolean isNearWater(int x, int y, int z) {
-		for (int dx = -2; dx <= 2; dx++) {
-			for (int dz = -2; dz <= 2; dz++) {
-				int blockID = this.world.getBlockId(x + dx, y, z + dz);
-				if (blockID == Blocks.FLUID_WATER_FLOWING.id() || blockID == Blocks.FLUID_WATER_STILL.id()) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	private boolean isFlatLand(int x, int y, int z) {

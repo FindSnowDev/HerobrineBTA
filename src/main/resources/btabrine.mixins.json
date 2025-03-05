@@ -7,6 +7,7 @@
     "MixinBlockFire",
     "MixinChunkDecoratorOverworld",
     "MixinWorld",
+    "MixinFog",
     "MixinSleepEvent"
   ],
   "client": [

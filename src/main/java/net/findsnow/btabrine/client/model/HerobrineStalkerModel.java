@@ -4,7 +4,7 @@ import net.minecraft.client.render.model.Cube;
 import net.minecraft.client.render.model.ModelBase;
 import net.minecraft.core.util.helper.MathHelper;
 
-public class HerobrineModel extends ModelBase {
+public class HerobrineStalkerModel extends ModelBase {
 	public Cube head;
 	public Cube body;
 	public Cube rightArm;
@@ -15,8 +15,7 @@ public class HerobrineModel extends ModelBase {
 	private boolean isSitting = false;
 	private boolean isSprinting = false;
 
-
-	public HerobrineModel(float expandAmount) {
+	public HerobrineStalkerModel(float expandAmount) {
 		head = new Cube(0, 0);
 		head.addBox(-4, -8f, -4f, 8, 8, 8, expandAmount);
 		head.setRotationPoint(0f, 0f, 0f);

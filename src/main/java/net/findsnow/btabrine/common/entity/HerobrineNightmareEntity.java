@@ -1,12 +1,13 @@
 package net.findsnow.btabrine.common.entity;
 
+import net.findsnow.btabrine.common.entity.base.HerobrineDreamBase;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class HerobrineNightmareEntity extends HerobrineEntity {
+public class HerobrineNightmareEntity extends HerobrineDreamBase {
 	private Entity targetEntity;
 	private int lifespan;
 	private float targetYaw;
@@ -15,12 +16,6 @@ public class HerobrineNightmareEntity extends HerobrineEntity {
 
 	public HerobrineNightmareEntity(@Nullable World world) {
 		super(world);
-		this.textureIdentifier = NamespaceID.getPermanent("btabrine", "herobrine");
-		this.fireImmune = true;
-		this.lifespan = 200;
-		this.collision = false;
-		this.moveSpeed = 0;
-		this.noPhysics = true;
 		this.shouldLookAtTarget(shouldLookAtTarget);
 	}
 
@@ -54,7 +49,6 @@ public class HerobrineNightmareEntity extends HerobrineEntity {
 			float pitch = (float) -(Math.atan2(deltaY, distance) * 180.0D / Math.PI);
 
 			this.yRot = yaw;
-			this.yBodyRot = yaw;
 			this.xRot = pitch;
 
 			this.yRotO = this.yRot;

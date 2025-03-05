@@ -1,27 +1,25 @@
 package net.findsnow.btabrine.common.entity;
 
-import net.minecraft.core.block.BlockLogicLayerBase;
+import net.findsnow.btabrine.common.entity.base.HerobrineBase;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.phys.Vec3;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.type.WorldTypes;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Random;
 
-public class HerobrineStalkingEntity extends HerobrineEntity {
+public class HerobrineStalkingEntity extends HerobrineBase {
 
-	private static final float SPAWN_CHANCE = 1.0f; // change this to something rare once im done testing
-	private static final float FLEE_DISTANCE = 10.0F; // distance at which he runs away
-	private static final float DESPAWN_DISTANCE = 16.0F; // distance at which he can de-spawn
-	private static final float STALK_DISTANCE = 30.0F; // distance to maintain when stalking
-	private static final float WINDOW_CHECK_RANGE = 30.0F; // distance to maintain when stalking windows
+	private static final float SPAWN_CHANCE = 0.05F;
+	private static final float IMMEDIATE_DESPAWN_DISTANCE = 1.0F;
+	private static final float STALK_DISTANCE = 15.0F;
+	private static final float WINDOW_CHECK_RANGE = 15.0F;
 
+	private int lifespan = 1200;
 	private Player targetPlayer;
 	private boolean isFleeing = false;
 	private int ticksExisted = 0;
@@ -30,10 +28,9 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 
 	public HerobrineStalkingEntity(@Nullable World world) {
 		super(world);
-		this.textureIdentifier = NamespaceID.getPermanent("btabrine", "herobrine");
-		this.moveSpeed = 0.0F;
-		this.roamRandomPath();
-		this.fireImmune = true;
+		this.isJumping = false;
+		this.moveSpeed = 0;
+		this.lastPos = Vec3.getTempVec3(this.x, this.y, this.z);
 	}
 
 	@Override
@@ -41,51 +38,44 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 		super.tick();
 		ticksExisted++;
 
+		lastPos = Vec3.getTempVec3(this.x, this.y, this.z);
+
+		if (lifespan > 0) {
+			lifespan--;
+			if (lifespan <= 0) {
+				placeRedstoneTorch();
+				this.remove();
+				System.out.println("Stalking Herobrine despawned due to lifespan");
+				return;
+			}
+		}
+
 		// start finding a player if one isn't present
 		if (targetPlayer == null || !targetPlayer.isAlive()) {
 			findNearestPlayer();
 		}
 
-		// if Herobrine got a target
 		if (targetPlayer != null) {
-			// make him always face player
 			faceEntity(targetPlayer, 360.0F, 360.0F);
 			float distanceToPlayer = getDistanceTo(targetPlayer);
 
-			// get last position
-			if (ticksExisted % 100 == 0) {
+			if (ticksExisted % 20 == 0) {
 				lastPos = Vec3.getTempVec3(this.x, this.y, this.z);
-				if (distanceToPlayer < FLEE_DISTANCE) {
-					// if player gets too close, run away
-					isFleeing = true;
-					moveSpeed = 0.8F; // Faster Move Speed when Running
-					fleeFromPlayer();
-				} else if (isFleeing && distanceToPlayer > DESPAWN_DISTANCE) {
-					// place red stone torch and de-spawn
-					placeRedstoneTorch();
-					remove();
-				} else if (!isFleeing) {
-					// normal stalking
-					if (distanceToPlayer > STALK_DISTANCE + 5.0F) {
-						// too far, get closer
-						moveSpeed = 0.15F;
-						moveTowards(targetPlayer, STALK_DISTANCE);
-					} else if (distanceToPlayer < STALK_DISTANCE - 5.0F) {
-						// too close, run away
-						moveSpeed = 0.4F;
-						moveAwayFrom(targetPlayer, STALK_DISTANCE);
-					} else {
-						// sweetspot, he'll stay here
-						moveSpeed = 0.0F;
-					}
-					// stalker behavior, watch for homes at night
-					if (world.getWorldTime() % 24000 > 13000 && world.getWorldTime() % 24000 < 23000) {
-						checkForWindowsAndHomes();
-					}
+
+				if (world.getWorldTime() % 24000 > 13000 && world.getWorldTime() % 24000 < 23000) {
+					checkForWindowsAndHomes();
 				}
+			}
+			if (distanceToPlayer < (STALK_DISTANCE - IMMEDIATE_DESPAWN_DISTANCE) + 1.7F) {
+				placeRedstoneTorch();
+				remove();
+				System.out.println("Herobrine has despawned!");
+			} else {
+				moveSpeed = 0.0F;
 			}
 		}
 	}
+
 
 	private float getDistanceTo(Player targetPlayer) {
 		float dx = (float) (this.x - targetPlayer.x);
@@ -105,7 +95,6 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 			float pitch = (float) -(Math.atan2(deltaY, distance) * 180.0D / Math.PI);
 
 			this.yRot = yaw;
-			this.yBodyRot = yaw;
 			this.xRot = pitch;
 
 			this.yRotO = this.yRot;
@@ -117,17 +106,23 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 	}
 
 	private void placeRedstoneTorch() {
-		if (lastPos != null) {
-			int torchX = (int) lastPos.x;
-			int torchY = (int) lastPos.y;
-			int torchZ = (int) lastPos.z;
+		if (random.nextInt(100) < 70) {
+			if (world != null) {
+				int torchX = MathHelper.floor(lastPos.x);
+				int torchY = MathHelper.floor(lastPos.y);
+				int torchZ = MathHelper.floor(lastPos.z);
 
-			while (world.getBlockId(torchX, torchY - 1, torchZ) == 0 && torchY > 0) {
-				torchY--;
-			}
+				while (torchY > 0 && world.getBlockId(torchX, torchY - 1, torchZ) == 0) {
+					torchY--;
+				}
 
-			if (world.getBlockId(torchX, torchY - 1, torchZ) != 0) {
-				world.setBlockWithNotify(torchX, torchY, torchZ, Blocks.TORCH_REDSTONE_ACTIVE.id());
+				int blockBelow = world.getBlockId(torchX, torchY - 1, torchZ);
+				if (blockBelow != 0 && world.getBlockId(torchX, torchY, torchZ) == 0) {
+					world.setBlockWithNotify(torchX, torchY, torchZ, Blocks.TORCH_REDSTONE_ACTIVE.id());
+					System.out.println("Placed redstone torch at " + torchX + ", " + torchY + ", " + torchZ);
+				} else {
+					System.out.println("Failed to place torch: invalid position");
+				}
 			}
 		}
 	}
@@ -194,73 +189,25 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 		return -1;
 	}
 
-	private void moveAwayFrom(Player targetPlayer, float stalkDistance) {
-		double dx = this.x - targetPlayer.x;
-		double dz = this.z - targetPlayer.z;
-
-		double distance = Math.sqrt(dx * dx + dz * dz);
-
-		if (distance < stalkDistance) {
-			double scale = 0.1 / distance;
-			xd = dx * scale;
-			zd = dz * scale;
-		} else {
-			xd = 0;
-            zd = 0;
-		}
-	}
-
-	private void moveTowards(Player targetPlayer, float stalkDistance) {
-		double dx = targetPlayer.x - this.x;
-		double dz = targetPlayer.z - this.z;
-
-		double distance = Math.sqrt(dx * dx + dz * dz);
-
-		if (distance > stalkDistance) {
-			double scale = 0.1 / distance;
-			xd = dx * scale;
-			zd = dz * scale;
-		} else {
-			xd = 0;
-			zd = 0;
-		}
-	}
-
-	private void fleeFromPlayer() {
-		double fleeX = x - targetPlayer.x;
-		double fleeZ = z - targetPlayer.z;
-
-		double length = Math.sqrt(fleeX * fleeX + fleeZ * fleeZ);
-		if (length > 0) {
-			fleeX = fleeX / length * 0.4;
-			fleeZ = fleeZ / length * 0.4;
-		}
-
-		xd = fleeX;
-		zd = fleeZ;
-	}
-
 	private void findNearestPlayer() {
-		List<Player> players = world.getEntitiesWithinAABB(
-			Player.class,
-			getBb().expand(64.0, 64.0, 64.0)
-		);
-		if (!players.isEmpty()) {
-			Player nearest = null;
+		if (world != null && world.players != null) {
+			Player nearestPlayer = null;
 			double nearestDistance = Double.MAX_VALUE;
+			double searchRadius = 64.0;
 
-			for (Player player : players) {
+			for (Player player : world.players) {
 				double distance = getDistanceTo(player);
-				if (distance < nearestDistance) {
-					nearest = player;
+				if (distance <= searchRadius && distance < nearestDistance) {
+					nearestPlayer = player;
 					nearestDistance = distance;
 				}
 			}
-			targetPlayer = nearest;
+			targetPlayer = nearestPlayer;
 		}
 	}
 
 	public static boolean trySpawn(World world, Player player) {
+
 		Random random = new Random();
 		if (random.nextFloat() > SPAWN_CHANCE) {
 			return false;
@@ -268,20 +215,28 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 
 		boolean isNight = world.getWorldTime() % 24000 > 13000 && world.getWorldTime() % 24000 < 23000;
 		boolean playerInCave = isPlayerUnderground(player, world);
+		boolean playerNearHome = isPlayerNearHome(player, world);
 
-		if (!isNight || !playerInCave) {
+		if (!isNight && !playerInCave) {
+			return false;
+		}
+
+		if (!playerInCave && !playerNearHome) {
+			return false;
+		}
+
+		if (hasExistingHerobrineStalker(world)) {
 			return false;
 		}
 
 		int tryCount = 0;
 		while (tryCount < 10) {
 			double angle = random.nextDouble() * Math.PI * 2;
-			double distance = 15.0 + random.nextDouble() * 10.0;
+			double distance = 10.0 + random.nextDouble() * 10.0;
 
 			int spawnX = (int) (player.x + Math.sin(angle) * distance);
 			int spawnZ = (int) (player.z + Math.cos(angle) * distance);
 
-			// Find Y position
 			int spawnY = -1;
 			for (int y = (int)player.y + 5; y > (int)player.y - 10; y--) {
 				if (world.getBlockId(spawnX, y, spawnZ) != 0 &&
@@ -290,13 +245,13 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 					spawnY = y + 1;
 					break;
 				}
-		}
+			}
 			if (spawnY != -1) {
-				// Found a spot! Spawn Herobrine
 				HerobrineStalkingEntity herobrine = new HerobrineStalkingEntity(world);
 				herobrine.setPos(spawnX + 0.5, spawnY, spawnZ + 0.5);
 				herobrine.targetPlayer = player;
 				world.entityJoinedWorld(herobrine);
+				System.out.println("Stalker Herobrine is now spawned at " + spawnX + ", " + spawnY + ", " + spawnZ);
 				return true;
 			}
 
@@ -305,7 +260,38 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 		return false;
 	}
 
-	private static boolean isPlayerUnderground(Player player, World world) {
+	public static boolean hasExistingHerobrineStalker(World world) {
+		List<Entity> entities = world.getLoadedEntityList();
+		for (Entity entity : entities) {
+			if (entity instanceof HerobrineStalkingEntity && !entity.removed) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isPlayerNearHome(Player player, World world) {
+		int homeRadius = 32;
+		int homeBlockCount = 0;
+
+		for (int x = -homeRadius; x <= homeRadius; x++) {
+			for (int y = -2; y <= 4; y++) {
+				for (int z = -homeRadius; z <= homeRadius; z++) {
+					int blockId = world.getBlockId(
+						(int) player.x + x,
+						(int) player.y + y,
+						(int) player.z + z
+					);
+					if (blockId != 0 && blockId != Blocks.GRASS.id() && blockId != Blocks.DIRT.id()) {
+						homeBlockCount++;
+					}
+				}
+			}
+		}
+		return homeBlockCount > 50;
+	}
+
+	public static boolean isPlayerUnderground(Player player, World world) {
 		boolean canSeeSky = world.canBlockSeeTheSky((int)player.x, (int)player.y, (int)player.z);
 
 		if (world.getWorldType().equals(WorldTypes.OVERWORLD_EXTENDED) && !canSeeSky && player.y < 130) {
@@ -314,5 +300,19 @@ public class HerobrineStalkingEntity extends HerobrineEntity {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	protected String getHurtSound() {
+		return null;
+	}
+
+	@Override
+	public void knockBack(Entity entity, int i, double d, double d1) {
+	}
+
+	@Override
+	protected String getDeathSound() {
+		return null;
 	}
 }

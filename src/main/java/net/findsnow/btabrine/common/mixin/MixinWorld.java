@@ -1,12 +1,11 @@
 package net.findsnow.btabrine.common.mixin;
 
 import net.findsnow.btabrine.client.sounds.IHerobrineCues;
-import net.minecraft.client.sound.SoundEvent;
+import net.findsnow.btabrine.common.entity.HerobrineStalkingEntity;
+import net.findsnow.btabrine.common.util.HerobrineManager;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.sound.BlockSounds;
 import net.minecraft.core.sound.SoundCategory;
-import net.minecraft.core.sound.SoundTypes;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
@@ -87,7 +86,13 @@ public abstract class MixinWorld implements WorldSource, IHerobrineCues {
 	}
 
 	@Unique
+	private void btabrine_herobrineManager() {
+		HerobrineManager.getInstance().onWorldTick((World)(Object)this);
+	}
+
+	@Unique
 	private int btabrine_soundCounter;
+
 	@Unique
 	private final Set<ChunkCoordinate> btabrine_posToUpdate = new HashSet<>();
 
@@ -129,7 +134,7 @@ public abstract class MixinWorld implements WorldSource, IHerobrineCues {
 				int blockZ = chunkBlockZ + (randVal / 256 & 15);
 				int blockY = getHeightValue(blockX, blockZ) - 5 - rand.nextInt(10);
 
-				if (rand.nextInt(100) < 20) {
+				if (rand.nextInt(100) < 0.5) {
 					Player closestPlayer = getClosestPlayer(blockX + 0.5, blockY + 0.5, blockZ + 0.5, 24);
 					if (closestPlayer != null) {
 						double distSq = closestPlayer.distanceToSqr(blockX + 0.5, blockY + 0.5, blockZ + 0.5);
@@ -188,5 +193,6 @@ public abstract class MixinWorld implements WorldSource, IHerobrineCues {
 	@Inject(method = "tick", at = @At("TAIL"))
 	private void btabrine_tick(CallbackInfo callbackInfo) {
 		btabrine_startSoundCue();
+		btabrine_herobrineManager();
 	}
 }

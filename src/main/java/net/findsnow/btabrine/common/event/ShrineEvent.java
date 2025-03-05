@@ -1,6 +1,9 @@
 package net.findsnow.btabrine.common.event;
 
+import net.findsnow.btabrine.common.entity.HerobrineNightmareEntity;
+import net.findsnow.btabrine.common.entity.HerobrineStalkingEntity;
 import net.minecraft.core.block.Blocks;
+import net.minecraft.core.entity.EntityLightning;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.weather.Weathers;
 
@@ -29,13 +32,25 @@ public class ShrineEvent {
 	}
 
 	private void activateShrine(World world, int x, int y, int z) {
-		if (world != null) {
-			if (world.rand.nextInt(100) < 20) {
+		if (world == null || world.weatherManager == null) {
+			return;
+		}
 
-				if (world.weatherManager != null) {
-					world.weatherManager.overrideWeather(Weathers.OVERWORLD_FOG, 50, 0.250F);
-				}
-			}
+		int chance = world.rand.nextInt(100);
+
+		if (chance < 2) {
+
+			world.weatherManager.overrideWeather(Weathers.getWeather(9), Weathers.OVERWORLD_CLEAR, 10, 1.0F, 1.0F);
+
+			EntityLightning lightning = new EntityLightning(world);
+			world.entityJoinedWorld(lightning);
+
+			HerobrineNightmareEntity herobrine = new HerobrineNightmareEntity(world);
+			world.entityJoinedWorld(herobrine);
+		}
+		else if (chance < 5) {
+
+			world.weatherManager.overrideWeather(Weathers.getWeather(9), Weathers.OVERWORLD_CLEAR, 10, 1.0F, 1.0F);
 		}
 	}
 
