@@ -21,18 +21,17 @@ public class HerobrineManager {
 	private long lastWanderingSpawn = 0;
 	private long lastNightmareSpawn = 0;
 
-	private static final int STALKING_COOLDOWN = 1200;
-	private static final int WANDERING_COOLDOWN = 1200;
-	private static final int ENTITY_LIFESPAN = 1200;
+	private static final int STALKING_COOLDOWN = 2400;
+	private static final int WANDERING_COOLDOWN = 2400;
+	private static final int ENTITY_LIFESPAN = 3600;
 
-	private static final float STALKING_CHANCE = 0.3F;
-	private static final float WANDERING_CHANCE = 0.4F;
+	private static final float STALKING_CHANCE = 0.04F;
+	private static final float WANDERING_CHANCE = 0.05F;
 
 	// personalized cooldowns, testing for MP
 	private Map<String, Long> playerCooldowns = new HashMap<>();
 
 	private Random random = new Random();
-
 
 	// singleton
 	private HerobrineManager() {

@@ -26,7 +26,7 @@ public class SleepEvent {
 	public void startNightmare(Player player) {
 		isNightmareRunning = true;
 		targetPlayer = player;
-		nightmareDuration = 60 + random.nextInt(120);
+		nightmareDuration = 100;
 
 		spawnHerobrine(player);
 	}
@@ -93,7 +93,7 @@ public class SleepEvent {
 		herobrineNightmare = new HerobrineNightmareEntity(world);
 		herobrineNightmare.setPos(herobrineX, herobrineY, herobrineZ);
 		herobrineNightmare.setWatchTarget(player);
-		herobrineNightmare.setLifespan(nightmareDuration + 20);
+		herobrineNightmare.setLifespan(nightmareDuration);
 
 		float yaw = 0;
 		switch (bedDirection) {

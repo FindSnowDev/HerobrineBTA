@@ -4,17 +4,17 @@
   "version": "${version}",
 
   "name": "BTA Herobrine",
-  "description": "Herobrine in BTA.",
+  "description": "Experience Herobrine as you were always meant to, with the chilling atmosphere of Beta Minecraft. He will always be there, watching",
   "authors": [
     "FindSnow"
   ],
   "contact": {
     "homepage": "",
-    "sources": ""
+    "sources": "https://github.com/FindSnowDev/HerobrineBTA"
   },
 
 	"icon": "icon.png",
-  "license": "MIT",
+  "license": "CC0-1.0",
 
   "environment": "*",
   "entrypoints": {
