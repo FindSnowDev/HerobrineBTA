@@ -98,7 +98,7 @@ public abstract class MixinWorld implements WorldSource, IHerobrineCues {
 
 	@Inject(method = "<init>()V", at = @At("TAIL"))
 	private void btabrine_initCounter(CallbackInfo callbackInfo) {
-		btabrine_soundCounter = rand.nextInt(200);
+		btabrine_soundCounter = rand.nextInt(600);
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public abstract class MixinWorld implements WorldSource, IHerobrineCues {
 								}
 							}
 							playSoundEffect(null, SoundCategory.CAVE_SOUNDS, blockX + 0.5, blockY + 0.5, blockZ + 0.5, soundPath, volume, pitch);
-							btabrine_soundCounter = isInCave || !isDaytime() ? 100 + rand.nextInt(200) : 300 + rand.nextInt(600);
+							btabrine_soundCounter = isInCave || !isDaytime() ? 400 + rand.nextInt(600) : 800 + rand.nextInt(1200);
 							return;
 						}
 					}
