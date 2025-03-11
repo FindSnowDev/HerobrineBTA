@@ -10,8 +10,8 @@ import net.findsnow.btabrine.client.renderer.HerobrineNightmareRenderer;
 import net.findsnow.btabrine.client.renderer.HerobrineStalkerRenderer;
 import net.findsnow.btabrine.client.renderer.HerobrineWanderRenderer;
 import net.findsnow.btabrine.common.entity.HerobrineNightmareEntity;
-import net.findsnow.btabrine.common.entity.HerobrineStalkingEntity;
 import net.findsnow.btabrine.common.entity.HerobrineWanderingEntity;
+import net.findsnow.btabrine.common.entity.prototype.HWatcherEntity;
 import net.minecraft.core.util.collection.NamespaceID;
 import turniplabs.halplibe.helper.EntityHelper;
 import turniplabs.halplibe.helper.ModelHelper;
@@ -30,7 +30,7 @@ public class BTABEntities {
 	    );
 	    // STALKER HEROBRINE
 	    EntityHelper.createEntity(
-		    HerobrineStalkingEntity.class,
+		    HWatcherEntity.class,
 		    NamespaceID.getPermanent(BTABrine.MOD_ID, "herobrineStalker"),
 		    "entity.btabrine.herobrine_stalker",
 		    "herobrineStalker",
@@ -50,7 +50,7 @@ public class BTABEntities {
 	public static void registerRenderers() {
 		// NEW
 		ModelHelper.setEntityModel(HerobrineNightmareEntity.class,  () -> new HerobrineNightmareRenderer(new HerobrineNightmareModel(0), 1));
-		ModelHelper.setEntityModel(HerobrineStalkingEntity.class,  () -> new HerobrineStalkerRenderer(new HerobrineStalkerModel(0), 1));
+		ModelHelper.setEntityModel(HWatcherEntity.class,  () -> new HerobrineStalkerRenderer(new HerobrineStalkerModel(0), 1));
 		ModelHelper.setEntityModel(HerobrineWanderingEntity.class,  () -> new HerobrineWanderRenderer(new HerobrineWanderModel(0), 1));
 	}
 }

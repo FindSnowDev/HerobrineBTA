@@ -1,11 +1,7 @@
 package net.findsnow.btabrine.common.mixin;
 
 
-import net.findsnow.btabrine.common.world.features.BTABMissingLeavesFeature;
 import net.findsnow.btabrine.common.world.features.BTABPyramidFeature;
-import net.findsnow.btabrine.common.world.features.BTABSignFeature;
-import net.findsnow.btabrine.common.world.features.BTABTunnelFeature;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
 import net.minecraft.core.world.generate.chunk.perlin.overworld.ChunkDecoratorOverworld;
@@ -24,10 +20,7 @@ public class MixinChunkDecoratorOverworld {
 	@Final
 	private World world;
 
-	@Inject(
-		method = "decorate",
-		at = @At("TAIL")
-	)
+	@Inject(method = "decorate", at = @At("TAIL"))
 	private void addPyramidGeneration(Chunk chunk, CallbackInfo ci) {
 		int chunkX = chunk.xPosition;
 		int chunkZ = chunk.zPosition;
@@ -41,31 +34,6 @@ public class MixinChunkDecoratorOverworld {
 
 		if (rand.nextInt(310) == 0 && y > 50 && isFlatLand(x, y - 1, z)) {
 			new BTABPyramidFeature().place(this.world, rand, x, y, z);
-		}
-
-		if (rand.nextInt(15) == 0) {
-			for (int attempts = 0; attempts < 3; attempts++) {
-				int tunnelX = chunkX * 16 + rand.nextInt(16);
-				int tunnelZ = chunkZ * 16 + rand.nextInt(16);
-				int surfaceY = this.world.getHeightValue(tunnelX, tunnelZ);
-				int tunnelY;
-
-				if (surfaceY > 80) {
-					tunnelY = 10 + rand.nextInt(surfaceY - 25);
-				} else {
-					tunnelY = 20 + rand.nextInt(50);
-				}
-
-				if (this.world.getBlockId(tunnelX, tunnelY, tunnelZ) != 0 ) {
-					if (new BTABTunnelFeature().place(this.world, rand, tunnelX, tunnelY, tunnelZ)) {
-						break;
-					}
-				}
-			}
-		}
-
-		if (rand.nextInt(20) == 0) {
-			new BTABMissingLeavesFeature().place(this.world, rand, chunkX, 0, chunkZ);
 		}
 	}
 

@@ -29,6 +29,9 @@
 		],
 		"recipesReady": [
           "net.findsnow.btabrine.BTABrine"
+		],
+		"modmenu": [
+			"net.findsnow.btabrine.common.compat.BTABModMenu"
 		]
 	},
   "mixins": [

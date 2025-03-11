@@ -1,9 +1,8 @@
 package net.findsnow.btabrine.common.util;
 
-
 import net.findsnow.btabrine.common.entity.HerobrineNightmareEntity;
-import net.findsnow.btabrine.common.entity.HerobrineStalkingEntity;
 import net.findsnow.btabrine.common.entity.HerobrineWanderingEntity;
+import net.findsnow.btabrine.common.entity.prototype.HWatcherEntity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.world.World;
 
@@ -25,7 +24,7 @@ public class HerobrineManager {
 	private static final int WANDERING_COOLDOWN = 2400;
 	private static final int ENTITY_LIFESPAN = 3600;
 
-	private static final float STALKING_CHANCE = 0.04F;
+	private static final float STALKING_CHANCE = 1F;
 	private static final float WANDERING_CHANCE = 0.05F;
 
 	// personalized cooldowns, testing for MP
@@ -66,7 +65,7 @@ public class HerobrineManager {
 		if (random.nextFloat() * 100 < STALKING_CHANCE) {
 			for (Player player : world.players) {
 				if (isPlayerEligbleForStalking(player, world)) {
-					if (HerobrineStalkingEntity.trySpawn(world, player)) {
+					if (HWatcherEntity.trySpawn(world, player)) {
 						lastStalkingSpawn = world.getWorldTime();
 						return;
 					}
@@ -128,14 +127,15 @@ public class HerobrineManager {
 	private boolean isPlayerEligbleForStalking(Player player, World world) {
 		boolean isNight = world.getWorldTime() % 24000 > 13000 && world.getWorldTime() % 24000 < 23000;
 		boolean playerInCave = isPlayerUnderground(player, world);
+		boolean playerInWild = !isPlayerUnderground(player, world);
 
-		return isNight || playerInCave;
+		return (isNight && (playerInCave || playerInWild) && world.canBlockSeeTheSky((int)player.x, (int)player.y, (int)player.z));
 	}
 
 
 
 	private boolean hasExistingHerobrineEntity(World world) {
-		return HerobrineStalkingEntity.hasExistingHerobrineStalker(world) || hasExistingWanderingHerobrine(world) || hasExistingNightmareHerobrine(world);
+		return HWatcherEntity.hasExistingHerobrineStalker(world) || hasExistingWanderingHerobrine(world) || hasExistingNightmareHerobrine(world);
 	}
 
 	private boolean hasExistingNightmareHerobrine(World world) {

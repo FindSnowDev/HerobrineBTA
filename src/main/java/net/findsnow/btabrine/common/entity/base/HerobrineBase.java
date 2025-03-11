@@ -1,6 +1,7 @@
 package net.findsnow.btabrine.common.entity.base;
 
 import com.mojang.nbt.tags.CompoundTag;
+import net.findsnow.btabrine.common.util.HDetector;
 import net.minecraft.core.entity.MobPathfinder;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.world.World;
@@ -8,11 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class HerobrineBase extends MobPathfinder {
+	protected final HDetector entityDetector;
+
 	public HerobrineBase(@Nullable World world) {
 		super(world);
 		this.textureIdentifier = NamespaceID.getPermanent("btabrine", "herobrine");
 		this.fireImmune = true;
 		this.setSize(0.6F, 1.8F);
+		this.entityDetector = new HDetector();
 	}
 
 	@Override

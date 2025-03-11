@@ -1,10 +1,42 @@
+#Mob Registry
 entity.btabrine.herobrine_nightmare=HerobrineNightmare
 entity.btabrine.herobrine_stalker=HerobrineStalker
 entity.btabrine.herobrine_wanderer=HerobrineWanderer
 btabrine.name=Herobrine
 btabrine.desc=Herobrine
 
+
+# Subtitles
 mob.herobrine.vanish=Vanish
 subtitles.ambient.herobrine.mining=Nearby blocks breaking
 subtitles.ambient.herobrine.footsteps=Footsteps
 subtitles.ambient.herobrine.door=Door
+
+
+# Weather
+weather.overworld.herobrine_fog.name=
+
+
+# Achievement Page - Use in order!
+gui.achievements.page.herobrine.name=Herobrine
+gui.achievements.page.herobrine.desc=Have you discovered him?
+
+
+# Achievements
+achievement.hello=Hello
+achievement.sweeterDreams=Sweeter Dreams
+
+
+# Achievement Descriptions
+achievement.hello.desc=Use the Herobrine shrine
+achievement.sweeterDreams.desc=Have Herobrine appear beside your bed at night
+
+
+# Config
+btabrine.config.title=Herobrine Configuration
+btabrine.config.achievements=Achievements
+btabrine.config.summon=Shrine summons Herobrine
+btabrine.config.enabled=Enabled
+btabrine.config.disabled=Disabled
+btabrine.gui.done=Done
+btabrine.config.restart_required=Game restart required for changes to take effect. Sorry!

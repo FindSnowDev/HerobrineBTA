@@ -1,33 +1,33 @@
-package net.findsnow.btabrine.common.entity;
+package net.findsnow.btabrine.common.entity.prototype;
 
 import net.findsnow.btabrine.common.entity.base.HerobrineBase;
-import net.minecraft.core.achievement.Achievement;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.phys.Vec3;
 import net.minecraft.core.world.World;
-import net.minecraft.core.world.type.WorldTypes;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Random;
 
-public class HerobrineStalkingEntity extends HerobrineBase {
+public class HWatcherEntity extends HerobrineBase {
 
 	private static final float SPAWN_CHANCE = 0.05F;
 	private static final float IMMEDIATE_DESPAWN_DISTANCE = 1.0F;
 	private static final float STALK_DISTANCE = 15.0F;
 	private static final float WINDOW_CHECK_RANGE = 15.0F;
 
+	private boolean isFleeing = false;
 	private int lifespan = 1200;
 	private Player targetPlayer;
-	private boolean isFleeing = false;
 	private int ticksExisted = 0;
 	private Random random = new Random();
+
 	private Vec3 lastPos;
 
-	public HerobrineStalkingEntity(@Nullable World world) {
+	public HWatcherEntity(@Nullable World world) {
 		super(world);
 		this.isJumping = false;
 		this.moveSpeed = 0;
@@ -57,14 +57,19 @@ public class HerobrineStalkingEntity extends HerobrineBase {
 		}
 
 		if (targetPlayer != null) {
+			// Track the player's position for potential teleporting later
+			faceEntity(targetPlayer, 360.0F, 360.0F);
+
 			faceEntity(targetPlayer, 360.0F, 360.0F);
 			float distanceToPlayer = getDistanceTo(targetPlayer);
 
 			if (ticksExisted % 20 == 0) {
 				lastPos = Vec3.getTempVec3(this.x, this.y, this.z);
 
-				if (world.getWorldTime() % 24000 > 13000 && world.getWorldTime() % 24000 < 23000) {
-					checkForWindowsAndHomes();
+				if (entityDetector.isNightTime(world)) {
+					if (entityDetector.checkForWindowsNearPlayer(targetPlayer, world)) {
+						tryPositionAtWindow();
+					}
 				}
 			}
 			if (distanceToPlayer < (STALK_DISTANCE - IMMEDIATE_DESPAWN_DISTANCE) + 1.7F) {
@@ -77,6 +82,9 @@ public class HerobrineStalkingEntity extends HerobrineBase {
 		}
 	}
 
+	private void tryPositionAtWindow() {
+		entityDetector.findWindowPos(targetPlayer, world, WINDOW_CHECK_RANGE, this);
+	}
 
 	private float getDistanceTo(Player targetPlayer) {
 		float dx = (float) (this.x - targetPlayer.x);
@@ -128,68 +136,6 @@ public class HerobrineStalkingEntity extends HerobrineBase {
 		}
 	}
 
-	private void checkForWindowsAndHomes() {
-		if (random.nextInt(100) != 0) return;
-
-		int blockCount = 0;
-		int totalChecks = 0;
-
-		for (int x = -3; x <= 3; x++) {
-			for (int y = -1; y <= 3; y++){
-				for (int z = -3; z <= 3; z++) {
-					int blockId = world.getBlockId(
-						(int) targetPlayer.x + x,
-						(int) targetPlayer.y + y,
-						(int) targetPlayer.z + z
-					);
-					if (blockId != 0) {
-						blockCount++;
-					}
-					totalChecks++;
-				}
-			}
-		}
-		if ((double) blockCount / totalChecks > 0.5) {
-			tryPositionAtWindow();
-		}
-	}
-
-	private void tryPositionAtWindow() {
-		for (int range = 5; range <= WINDOW_CHECK_RANGE; range += 5) {
-			for (int i = 0; i < 10; i++) {
-				double angle = random.nextDouble() * Math.PI * 2;
-				int checkX = (int) (targetPlayer.x + Math.sin(angle) * range);
-				int checkZ = (int) (targetPlayer.z + Math.cos(angle) * range);
-
-				int groundY = findGroundLevel(checkX, checkZ);
-				if (groundY > 0) {
-					for (int y = groundY; y < groundY + 8; y++) {
-						if (isWindowBlock(checkX, y, checkZ)) {
-							setPos(checkX + 0.5, y + 0.5, checkZ + 0.5);
-							moveSpeed = 0;
-							isFleeing = false;
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private boolean isWindowBlock(int checkX, int checkY, int checkZ) {
-		int blockId = world.getBlockId(checkX, checkY, checkZ);
-		return blockId == Blocks.GLASS.id() || blockId == Blocks.GLASS_TINTED.id();
-	}
-
-	private int findGroundLevel(int checkX, int checkZ) {
-		for (int y = (int) targetPlayer.y + 5; y > (int) targetPlayer.y - 10; y--) {
-			if (world.getBlockId(checkX, y, checkZ) != 0 && world.getBlockId(checkX, y + 1, checkZ) == 0) {
-				return y + 1;
-			}
-		}
-		return -1;
-	}
-
 	private void findNearestPlayer() {
 		if (world != null && world.players != null) {
 			Player nearestPlayer = null;
@@ -208,16 +154,17 @@ public class HerobrineStalkingEntity extends HerobrineBase {
 	}
 
 	public static boolean trySpawn(World world, Player player) {
-
 		Random random = new Random();
 		if (random.nextFloat() > SPAWN_CHANCE) {
 			return false;
 		}
 
-		boolean isNight = world.getWorldTime() % 24000 > 13000 && world.getWorldTime() % 24000 < 23000;
-		boolean playerInCave = isPlayerUnderground(player, world);
-		boolean playerNearHome = isPlayerNearHome(player, world);
-		boolean playerInWild = !playerInCave && !playerNearHome && world.canBlockSeeTheSky((int)player.x, (int)player.y, (int)player.z);
+		HWatcherEntity hStalkingEntity = new HWatcherEntity(world);
+
+		boolean isNight = hStalkingEntity.entityDetector.isNightTime(world);
+		boolean playerInCave = hStalkingEntity.entityDetector.isPlayerUnderground(player, world);
+		boolean playerNearHome = hStalkingEntity.entityDetector.isPlayerNearHome(player, world);
+		boolean playerInWild = hStalkingEntity.entityDetector.isPLayerInWild(player, world);
 
 		if (!isNight && (!playerInCave || !playerNearHome && !playerInWild)) {
 			return false;
@@ -245,7 +192,7 @@ public class HerobrineStalkingEntity extends HerobrineBase {
 				}
 			}
 			if (spawnY != -1) {
-				HerobrineStalkingEntity herobrine = new HerobrineStalkingEntity(world);
+				HWatcherEntity herobrine = new HWatcherEntity(world);
 				herobrine.setPos(spawnX + 0.5, spawnY, spawnZ + 0.5);
 				herobrine.targetPlayer = player;
 				world.entityJoinedWorld(herobrine);
@@ -258,48 +205,12 @@ public class HerobrineStalkingEntity extends HerobrineBase {
 		return false;
 	}
 
-	public static void achievement(Achievement achievement, World world, Player player) {
-		achievement.setClientsideAchievement();
-	}
-
 	public static boolean hasExistingHerobrineStalker(World world) {
 		List<Entity> entities = world.getLoadedEntityList();
 		for (Entity entity : entities) {
-			if (entity instanceof HerobrineStalkingEntity && !entity.removed) {
+			if (entity instanceof HWatcherEntity && !entity.removed) {
 				return true;
 			}
-		}
-		return false;
-	}
-
-	private static boolean isPlayerNearHome(Player player, World world) {
-		int homeRadius = 32;
-		int homeBlockCount = 0;
-
-		for (int x = -homeRadius; x <= homeRadius; x++) {
-			for (int y = -2; y <= 4; y++) {
-				for (int z = -homeRadius; z <= homeRadius; z++) {
-					int blockId = world.getBlockId(
-						(int) player.x + x,
-						(int) player.y + y,
-						(int) player.z + z
-					);
-					if (blockId != 0 && blockId != Blocks.GRASS.id() && blockId != Blocks.DIRT.id()) {
-						homeBlockCount++;
-					}
-				}
-			}
-		}
-		return homeBlockCount > 50;
-	}
-
-	public static boolean isPlayerUnderground(Player player, World world) {
-		boolean canSeeSky = world.canBlockSeeTheSky((int)player.x, (int)player.y, (int)player.z);
-
-		if (world.getWorldType().equals(WorldTypes.OVERWORLD_EXTENDED) && !canSeeSky && player.y < 130) {
-			return true;
-		} else if (world.getWorldType().equals(WorldTypes.OVERWORLD_DEFAULT) && !canSeeSky && player.y < 50) {
-			return true;
 		}
 		return false;
 	}

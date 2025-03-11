@@ -1,6 +1,10 @@
 package net.findsnow.btabrine.common.event;
 
 import net.findsnow.btabrine.common.entity.HerobrineNightmareEntity;
+import net.findsnow.btabrine.common.registry.BTABAchievements;
+import net.findsnow.btabrine.common.util.BTABrineConfig;
+import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.world.World;
@@ -9,7 +13,7 @@ import java.util.Random;
 
 public class SleepEvent {
 	private static final Random random = new Random();
-	private static final float NIGHTMARE_CHANCE = 0.03F;
+	private static final float NIGHTMARE_CHANCE = 0.9F;
 
 	private boolean isNightmareRunning = false;
 	private int nightmareDuration = 0;
@@ -27,8 +31,8 @@ public class SleepEvent {
 		isNightmareRunning = true;
 		targetPlayer = player;
 		nightmareDuration = 100;
-
 		spawnHerobrine(player);
+		player.triggerAchievement(BTABAchievements.herobrineAchievements.get(1));
 	}
 
 	public boolean updateNightmare() {
@@ -90,6 +94,10 @@ public class SleepEvent {
 				break;
 		}
 
+		herobrineX = findSafeX(world, herobrineX, herobrineY, herobrineZ);
+		herobrineY = findSafeY(world, herobrineX, herobrineY, herobrineZ);
+		herobrineZ = findSafeZ(world, herobrineX, herobrineY, herobrineZ);
+
 		herobrineNightmare = new HerobrineNightmareEntity(world);
 		herobrineNightmare.setPos(herobrineX, herobrineY, herobrineZ);
 		herobrineNightmare.setWatchTarget(player);
@@ -112,6 +120,71 @@ public class SleepEvent {
 		}
 		herobrineNightmare.setRot(yaw, 0);
 		world.entityJoinedWorld(herobrineNightmare);
+	}
+
+	private double findSafeZ(World world, double x, double y, double z) {
+		double width = 0.6;
+		double halfWidth = width / 2;
+
+		if (isPositionBlocked(world, x, y, z - halfWidth) || isPositionBlocked(world, x, y, z + halfWidth)) {
+			for (int offset = 1; offset <= 3; offset++) {
+				if (!isPositionBlocked(world, x, y, z + offset - halfWidth) && !isPositionBlocked(world, x, y, z + offset + halfWidth)) {
+					return z + offset;
+				}
+				if (!isPositionBlocked(world, x, y, z - offset - halfWidth) && !isPositionBlocked(world, x, y, z - offset + halfWidth)) {
+					return z - offset;
+				}
+			}
+		}
+		return z;
+	}
+
+	private double findSafeY(World world, double x, double y, double z) {
+		double height = 1.8;
+
+		if (isPositionBlocked(world, x, y, z) || isPositionBlocked(world, x, y + height, z)) {
+			for (int offset = 1; offset <= 3; offset++) {
+				if (!isPositionBlocked(world, x, y + offset, z) && !isPositionBlocked(world, x, y + offset + height, z)) {
+					return y + offset;
+				}
+			}
+			for (int offset = 1; offset <= 2; offset++) {
+				if (!isPositionBlocked(world, x, y - offset, z) && !isPositionBlocked(world, x, y - offset + height, z)) {
+					return y - offset;
+				}
+			}
+		}
+		return y;
+	}
+
+	private double findSafeX(World world, double x, double y, double z) {
+		double width = 0.6;
+		double halfWidth = width / 2;
+
+		if (isPositionBlocked(world, x - halfWidth, y, z) || isPositionBlocked(world, x + halfWidth, y, z)) {
+			for (int offset = 1; offset <= 3; offset++) {
+				if (!isPositionBlocked(world, x + offset - halfWidth, y, z) && !isPositionBlocked(world, x + offset + halfWidth, y , z)) {
+					return x + offset;
+				}
+				if (!isPositionBlocked(world, x - offset - halfWidth, y, z) && !isPositionBlocked(world, x - offset + halfWidth, y , z)) {
+					return x - offset;
+				}
+ 			}
+		}
+		return x;
+	}
+
+	private boolean isPositionBlocked(World world, double x, double y, double z) {
+		int blockX = MathHelper.floor(x);
+		int blockY = MathHelper.floor(y);
+		int blockZ = MathHelper.floor(z);
+		int blockId = world.getBlockId(blockX, blockY, blockZ);
+
+		if (blockId != 0) {
+			Block block = Blocks.blocksList[blockId];
+			return block != null && block.getMaterial().isSolid();
+		}
+		return false;
 	}
 
 	private int getBedDirection(int bedX, int bedY, int bedZ) {

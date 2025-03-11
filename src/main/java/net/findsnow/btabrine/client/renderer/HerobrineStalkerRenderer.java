@@ -1,7 +1,7 @@
 package net.findsnow.btabrine.client.renderer;
 
 import net.findsnow.btabrine.client.model.HerobrineStalkerModel;
-import net.findsnow.btabrine.common.entity.HerobrineStalkingEntity;
+import net.findsnow.btabrine.common.entity.prototype.HWatcherEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.LightmapHelper;
@@ -9,7 +9,7 @@ import net.minecraft.client.render.entity.MobRenderer;
 import net.minecraft.client.render.tessellator.Tessellator;
 import org.lwjgl.opengl.GL11;
 
-public class HerobrineStalkerRenderer extends MobRenderer<HerobrineStalkingEntity> {
+public class HerobrineStalkerRenderer extends MobRenderer<HWatcherEntity> {
 
 
 	public HerobrineStalkerRenderer(HerobrineStalkerModel model, float shadow) {
@@ -21,14 +21,14 @@ public class HerobrineStalkerRenderer extends MobRenderer<HerobrineStalkingEntit
 
 
 	@Override
-	public void render(Tessellator tessellator, HerobrineStalkingEntity entity, double x, double y, double z, float yaw, float partialTick) {
+	public void render(Tessellator tessellator, HWatcherEntity entity, double x, double y, double z, float yaw, float partialTick) {
 		GL11.glEnable(3042);
 		GL11.glBlendFunc(770, 771);
 		super.render(tessellator, entity, x, y, z, yaw, partialTick);
 		GL11.glDisable(3042);
 	}
 
-	private boolean setEyeBrightness(HerobrineStalkingEntity herobrineEntity, int i, float f) {
+	private boolean setEyeBrightness(HWatcherEntity herobrineEntity, int i, float f) {
 		if (i == 0) {
 			this.bindTexture("/assets/btabrine/textures/entity/herobrine/herobrine_eyes.png");
 			float brightness = herobrineEntity.getBrightness(1.0F);
@@ -48,18 +48,18 @@ public class HerobrineStalkerRenderer extends MobRenderer<HerobrineStalkingEntit
 	}
 
 	@Override
-	protected boolean prepareArmor(HerobrineStalkingEntity entity, int layer, float partialTick) {
+	protected boolean prepareArmor(HWatcherEntity entity, int layer, float partialTick) {
 		return setEyeBrightness(entity, layer, partialTick);
 	}
 
 	@Override
-	protected void setupScale(HerobrineStalkingEntity entity, float partialTick) {
+	protected void setupScale(HWatcherEntity entity, float partialTick) {
 		float scale = 0.9375F;
 		GL11.glScalef(scale, scale, scale);
 	}
 
 	@Override
-	protected float getMaxDeathRotation(HerobrineStalkingEntity entity) {
+	protected float getMaxDeathRotation(HWatcherEntity entity) {
 		return 90.0F;
 	}
 
